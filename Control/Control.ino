@@ -3,18 +3,16 @@
 #include <OneWire.h>
 #include <Servo.h>
 #include <Wire.h> 
-//#include <CapacitiveSensor.h>
 
 //Digital peripheries
-OneWire  onewire(10);  // DS18B20 on A1
+OneWire  onewire(10);
 OneWire  onewire2(12);
 DallasTemperature Temperatures(&onewire);
 DallasTemperature Temperatures2(&onewire2);
 DeviceAddress Temp1, Temp2, Temp3;
-
 Hx711 level(74, 75);
-//NewPing sonar(A2, 53, 200);
-//CapacitiveSensor levelSensor = CapacitiveSensor(A2,43);
+
+
 int Setpoint1, Setpoint2;
 
 //Pins
@@ -45,6 +43,7 @@ const int Pump_current1 = A1;
 const int Pump_current2 = A0;
 
 long waterlevelnull, waterlevel;
+double waterlevelcalibrated;
 //Servos
 Servo valve;
 
@@ -65,12 +64,14 @@ boolean maxpower = false;
 long seconds, tempsecs, tempmins, temphours;
 long startseconds, currentseconds, currentstartseconds, pausedatseconds, pausedatcurrentseconds, timeremaining;
 int counter = 0;
+int wlsetpoint;
 int currentPWM1, currentPWM2;
+long looptime = 0;
 
 //Functions
 void readserial(), controlheater();
 boolean openvalve(short pin), closevalve(short pin), tankempty(short tank);
-int readlevel();
+//int readlevel();
 
 void setup() {
   // initialize serial communication:
@@ -93,7 +94,6 @@ void setup() {
   pinMode(Heater2, OUTPUT);
   //digitalWrite(Led1, HIGH);
   
-  //levelSensor.set_CS_AutocaL_Millis(0xFFFFFFFF);
   //VEDD KI A KOMMENTET HA AKAROD HOGY MINDENT BEZARJON
   initialize();
   
@@ -115,7 +115,10 @@ void setup() {
   Temperatures.setResolution(Temp1, 12);
   Temperatures.setResolution(Temp2, 12);
   if (!Temperatures2.getDeviceCount()) {Serial.println("No secondary thermometer");}
-  
+  Temperatures.setWaitForConversion(false);
+  Temperatures2.setWaitForConversion(false);
+  Serial.print("Channel 1 parasite "); Serial.println(Temperatures.isParasitePowerMode());
+  Serial.print("Channel 2 parasite "); Serial.println(Temperatures2.isParasitePowerMode());
   waterlevelnull = level.averageValue(10);
   Serial.print("Water level nullpoint: "); Serial.println(waterlevelnull);
 }
@@ -130,10 +133,13 @@ void loop()
   if (millis()%1000 == 0)
   {
     //Never switch on both heat elements
+    looptime = millis();
     if (digitalRead(Heater1) == true) digitalWrite(Heater2, LOW);
     else if (digitalRead(Heater2) == true) digitalWrite(Heater1, LOW);
-    senddata();
     readtemp();
+    senddata();
+    waterlevel = level.averageValue(2);
+    waterlevelcalibrated=(waterlevel-waterlevelnull)/35294.1;
     if (maxpower == false)
     {
       controlheater();
@@ -150,10 +156,10 @@ void loop()
     }
     else Serial.println("R107 0");
     Serial.print("Temperature inside: "); Serial.println(Temperature3);
-    waterlevel = level.averageValue(10);
-    Serial.print("Water level: "); Serial.println(waterlevel);
     Serial.print("Water level delta: "); Serial.println(waterlevel-waterlevelnull);
-    //Serial.print("Water level: "); Serial.println(waterlevel/10);
+    Serial.print("Water level: "); Serial.print(waterlevelcalibrated); Serial.println(" liter");
+    looptime -= millis();
+    Serial.print("Loop time "); Serial.println(-looptime);
     //digitalWrite(Led1, !digitalRead(Led1));
   }
 }
@@ -259,9 +265,6 @@ void senddata()
       Serial.print("R105 ");
       Serial.println(1000-currentseconds);
     }
-    //unsigned int uS = sonar.ping();
-    //Serial.print("Water level ");
-    //Serial.println(uS / US_ROUNDTRIP_CM);
     //Serial.print("Current 1 ");
     //Serial.println(analogRead(Pump_current1));
     //Serial.print("Current 2 ");

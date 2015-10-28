@@ -240,7 +240,7 @@ void Brewing()
   }
   if (waterlevelcondition == true)
   {
-    if (waterlevelcalibrated > Waterlevelsetpoint)
+    if (waterlevelcalibrated > (Waterlevelsetpoint-1))
     {
       newstepstarted = true;
     }

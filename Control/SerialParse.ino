@@ -176,8 +176,8 @@ void readserial()
       //Cleaning program
       case 107: Serial.println("P107");
         Serial1.println("Short cleaning program");
-        BrewingSteps[0]  = {0,  false, true,  false, 0,   0,    false, false, false, false, false, 0,   false, 0,   255, 0, 90,   5, 0, false, true };
-        BrewingSteps[1]  = {1,  false, true,  false, 0,   0,    false, false, false, false, false, 0,   false, 255, 0,   0, 90,   6, 0, true,  false};
+        BrewingSteps[0] = {0, false, true,  false, 0,   0,    false, false, false, false, false, 0,   false, 0,   255, 0, 90,   5, 0, false, true };
+        BrewingSteps[1] = {1, false, true,  false, 0,   0,    false, false, false, false, false, 0,   false, 255, 0,   0, 90,   6, 0, true,  false};
         BrewingSteps[2] = {2, false, true,  true,  0,   0,    false, false, false, false, false, 0,   false, 255, 255, 0, 90,   6, 0, true,  true };
         BrewingSteps[3] = {3, false, false, true,  0,   0,    false, false, false, false, false, 0,   false, 255, 0,   0, 90,   4, 0, true,  false};
         BrewingSteps[4] = {4, false, false, true,  0,   0,    true,  false, false, false, false, 0,   false, 0,   125, 0, 60,   6, 0, false, true };
@@ -186,15 +186,22 @@ void readserial()
         BrewingSteps[7] = {7, false, false, true,  0,   0,    false, false, false, true,  false, 0,   false, 0,   125, 0, 60,   6, 0, false, true };
         BrewingSteps[8] = {8, false, false, false, 0,   0,    false, false, false, false, true,  0,   false, 0,   255, 0, 60,   6, 0, false, true };
         BrewingSteps[9] = {9, false, false, false, 0,   0,    false, false, false, false, false, 0,   false, 0,   0,   0, 0,    8, 0, false, false};
+        break;
+      //Automatic water inlet  
+      case 108: int wlsetpoint = Serial.parseInt();
+        Serial.println("P108");
+        BrewingSteps[0] = {0, true,  false, true,  0, 0, false, false, false, false, false, 0, false, 0, 0, wlsetpoint, 0, 1, 0, false, false};
+        BrewingSteps[1] = {1, false, false, false, 0, 0, false, false, false, false, false, 0, false, 0, 0,  0, 0, 8, 0, false, false};
+        break;
       //Inlet valve
       case 110: Serial.println("P110");
         Serial1.println("Inlet valve on");
-        digitalWrite(Valve_inlet, LOW);
+        digitalWrite(Valve_inlet, HIGH);
         Valve_inletstate = true;
         break;
       case 111: Serial.println("P111");
         Serial1.println("Inlet valve off");
-        digitalWrite(Valve_inlet, HIGH);
+        digitalWrite(Valve_inlet, LOW);
         Valve_inletstate = false;
         break;
       //Mashout valve

@@ -1,7 +1,8 @@
 boolean waterlevelcondition, temperaturecondition1, temperaturecondition2, tankemptycondition1, tankemptycondition2, timercondition, userinteraction;
 boolean maxtime, holdwaterlevel, boilingreached;
 boolean newstepstarted = false, brewingstarted = false;
-int Waterlevelsetpoint, Timesetpoint, i = 0;
+float Waterlevelsetpoint; 
+int Timesetpoint, i = 0;
 
 
 struct BrewingStep {
@@ -146,7 +147,7 @@ void Brewing()
     
     CurrentStep = BrewingSteps[i].number; Serial1.print(CurrentStep); Serial1.println(". step");
     
-    if (BrewingSteps[i].inletvalve==false && Valve_inletstate == true ) {digitalWrite(Valve_inlet, LOW);  Serial1.println("Inlet valve off");}
+    if (BrewingSteps[i].inletvalve==false && Valve_inletstate == true) {digitalWrite(Valve_inlet, LOW); Valve_inletstate = false; Serial1.println("Inlet valve off");}
     if (BrewingSteps[i].oneway1==true  && Valve_pump1state == false) {openvalve(Valve_pump1);  Valve_pump1state = true;  Serial1.println("One way valve 1 on");}
     if (BrewingSteps[i].oneway1==false && Valve_pump1state == true ) {closevalve(Valve_pump1); Valve_pump1state = false; Serial1.println("One way valve 1 off");}
     if (BrewingSteps[i].oneway2==true  && Valve_pump2state == false) {openvalve(Valve_pump2);  Valve_pump2state = true;  Serial1.println("One way valve 2 on");}
@@ -169,9 +170,9 @@ void Brewing()
     if (BrewingSteps[i].coolingvalve==false && Valve_coolstate == true ) {closevalve(Valve_cool); Valve_coolstate = false; Serial1.println("Cooling valve off");}
     if (BrewingSteps[i].outletvalve==true  && Valve_outletstate == false) {openvalve(Valve_outlet);  Valve_outletstate = true;  Serial1.println("Outlet valve on");}
     if (BrewingSteps[i].outletvalve==false && Valve_outletstate == true ) {closevalve(Valve_outlet); Valve_outletstate = false; Serial1.println("Outlet valve off");}
-    if (BrewingSteps[i].inletvalve==true  && Valve_inletstate == false) {digitalWrite(Valve_inlet, HIGH); Serial1.println("Inlet valve on");}
+    if (BrewingSteps[i].inletvalve==true  && Valve_inletstate == false) {digitalWrite(Valve_inlet, HIGH); Valve_inletstate=true; Serial1.println("Inlet valve on");}
     
-    Waterlevelsetpoint=BrewingSteps[i].waterlevel; Serial1.print("Water level setpoint: "); Serial1.println(Waterlevelsetpoint);
+    Waterlevelsetpoint=BrewingSteps[i].waterlevel/10.0; Serial.print("Water level setpoint: "); Serial.println(Waterlevelsetpoint);
     Serial1.print("Time: "); Serial1.println(BrewingSteps[i].time);
     Setpoint1 = BrewingSteps[i].temperature1; Serial1.print("Setpoint 1: "); Serial1.println(Setpoint1);
     Setpoint2 = BrewingSteps[i].temperature2; Serial1.print("Setpoint 2: "); Serial1.println(Setpoint2);
@@ -197,7 +198,7 @@ void Brewing()
     switch (BrewingSteps[i].condition)
     {
       case 0: Serial1.println("Faulty condition"); break;
-      case 1: waterlevelcondition=true; Serial1.println("Timer condition"); break;
+      case 1: waterlevelcondition=true; Serial1.println("Water level condition"); break;
       case 2: temperaturecondition1=true; Serial1.println("Temperature 1 condition"); break;
       case 3: temperaturecondition2=true; Serial1.println("Temperature 2 condition"); break;
       case 4: tankemptycondition1=true; Serial1.println("Tank 1 empty condition"); break;
@@ -237,13 +238,13 @@ void Brewing()
     }*/
     Serial1.println();
   }
-  /*if (waterlevelcondition == true)
+  if (waterlevelcondition == true)
   {
-    if (Waterlevel()==Waterlevelsetpoint)
+    if (waterlevelcalibrated > Waterlevelsetpoint)
     {
       newstepstarted = true;
     }
-  }*/
+  }
   if (temperaturecondition1 == true)
   {
     if (CalibratedTemperature1 >= Setpoint1)

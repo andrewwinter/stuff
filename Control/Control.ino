@@ -11,6 +11,7 @@ DallasTemperature Temperatures(&onewire);
 DallasTemperature Temperatures2(&onewire2);
 DeviceAddress Temp1, Temp2, Temp3;
 Hx711 level(74, 75);
+Servo valve;
 
 
 int Setpoint1, Setpoint2;
@@ -44,8 +45,7 @@ const int Pump_current2 = A0;
 
 long waterlevelnull, waterlevel;
 double waterlevelcalibrated;
-//Servos
-Servo valve;
+
 
 //Main Variables
 unsigned long ID = 1234567890;

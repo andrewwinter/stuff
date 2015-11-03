@@ -1,14 +1,5 @@
-long Waterlevel()
+float Waterlevel()
 {
-  /*int samples = 0;
-  long long average = 0;
-  for (samples = 0; samples < 10; samples++)
-  {
-    long start = millis();
-    long total =  levelSensor.capacitiveSensorRaw(10);
-    average += total;
-    delay(10);
-  }
-  //Serial.println(average/samples);
-  return (average/samples);*/
+  /*waterlevel = level.averageValue(10);
+  waterlevelcalibrated=(waterlevel-waterlevelnull)/35294.1;*/
 }

@@ -4,7 +4,6 @@ boolean newstepstarted = false, brewingstarted = false;
 float Waterlevelsetpoint; 
 int Timesetpoint, i = 0;
 
-
 struct BrewingStep {
   short number;
   boolean inletvalve, mashingvalve, boilingvalve;
@@ -143,9 +142,9 @@ void Brewing()
   currentseconds=millis()/1000-currentstartseconds; 
   //BrewingSteps BrewingStep[20];
   if (newstepstarted==true)
-  {
-    
-    CurrentStep = BrewingSteps[i].number; Serial1.print(CurrentStep); Serial1.println(". step");
+  {  
+    CurrentStep = BrewingSteps[i].number; Serial.print(CurrentStep); Serial.println(". step");
+    CurrentStepTime = BrewingSteps[i].time*1000; Serial.print(BrewingSteps[i].time*1000); Serial.println(" s");
     
     if (BrewingSteps[i].inletvalve==false && Valve_inletstate == true) {digitalWrite(Valve_inlet, LOW); Valve_inletstate = false; Serial1.println("Inlet valve off");}
     if (BrewingSteps[i].oneway1==true  && Valve_pump1state == false) {openvalve(Valve_pump1);  Valve_pump1state = true;  Serial1.println("One way valve 1 on");}

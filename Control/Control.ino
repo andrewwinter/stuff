@@ -13,7 +13,6 @@ DeviceAddress Temp1, Temp2, Temp3;
 Hx711 level(74, 75);
 Servo valve;
 
-
 int Setpoint1, Setpoint2;
 
 //Pins
@@ -52,6 +51,7 @@ unsigned long ID = 1234567890;
 double Temperature1, Temperature2, Temperature3;
 double CalibratedTemperature1, CalibratedTemperature2;
 short CurrentStep = 0;
+int CurrentStepTime = 0;
 boolean brewing = false;
 boolean Valve_inletstate, Valve_mashoutstate, Valve_boilstate, Valve_coolstate;
 boolean Valve_hop1state, Valve_hop2state, Valve_hop3state, Valve_hop4state, Valve_outletstate, Ventilatorstate; 
@@ -263,7 +263,12 @@ void senddata()
       Serial.print("R104 ");
       Serial.println(currentseconds);
       Serial.print("R105 ");
-      Serial.println(1000-currentseconds);
+      int current_time = CurrentStepTime - currentseconds;
+      if(current_time<0) 
+      {
+        current_time = 0;  
+      }
+      Serial.println(current_time);//1000-currentseconds);
     }
     //Serial.print("Current 1 ");
     //Serial.println(analogRead(Pump_current1));

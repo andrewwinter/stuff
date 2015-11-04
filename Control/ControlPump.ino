@@ -1,3 +1,70 @@
+const int counter_bonus_limit = 4;
+int counter_limit = 12;
+int half_counter_limit = int(counter_limit/2);
+int mashing_counter = 0;
+int boiling_counter = 0;
+
+boolean Mashingtankempty()
+{
+  if (analogRead(Pump_current1) < 400)
+  {
+    mashing_counter++;
+    Serial.println("Low current");
+    if (mashing_counter == half_counter_limit)
+    {
+      digitalWrite(Pump_A, LOW);
+      delay(1000);
+      digitalWrite(Pump_A, HIGH);
+    } 
+    else if (mashing_counter == (counter_limit + counter_bonus_limit))
+    {
+      mashing_counter = 0;
+      Serial.println("Empty");
+      return true;
+    }
+  }
+  else if(mashing_counter >= counter_limit && mashing_counter < (counter_limit + counter_bonus_limit))
+  {
+    counter_limit = mashing_counter;
+    half_counter_limit = int(counter_limit/2);
+    mashing_counter = 0;  
+  }
+  
+  Serial.println("Check if empty");
+  return false;
+}
+
+boolean Boilingtankempty()
+{
+  if (analogRead(Pump_current2) < 400)
+  {
+    boiling_counter++;
+    Serial.println("Low current");
+    if (boiling_counter == half_counter_limit)
+    {
+      digitalWrite(Pump_A, LOW);
+      delay(1000);
+      digitalWrite(Pump_A, HIGH);
+    } 
+    else if (boiling_counter == (counter_limit + counter_bonus_limit))
+    {
+      boiling_counter = 0;
+      Serial.println("Empty");
+      return true;
+    }
+  }
+  else if(boiling_counter >= counter_limit && boiling_counter < (counter_limit + counter_bonus_limit))
+  {
+    counter_limit = boiling_counter;
+    half_counter_limit = int(counter_limit/2);
+    boiling_counter = 0;  
+  }
+  
+  Serial.println("Check if empty");
+  return false;
+}
+
+/*
 boolean Mashingtankempty()
 {
   boolean empty = false;

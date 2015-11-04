@@ -155,13 +155,6 @@ void readserial()
       //Drain everything
       case 105: Serial.println("P105");
         Serial1.println("Drain down everything");
-        //openvalve(Valve_pump1); Valve_pump1state = true;
-        //openvalve(Valve_pump2); Valve_pump2state = true;
-        //openvalve(Valve_outlet);Valve_outletstate = true;
-        //openvalve(Valve_hop1);  Valve_hop1state = true;
-        //openvalve(Valve_hop2);  Valve_hop2state = true;
-        //openvalve(Valve_hop3);  Valve_hop3state = true;
-        //openvalve(Valve_hop4);  Valve_hop4state = true;
         BrewingSteps[0] = {0, false, false,  false, 0,   0,    false, false, false, false, false, 0,   true,  0,   255, 0, 90,   5, 0, false, true  };
         BrewingSteps[1] = {1, false, false,  false, 0,   0,    false, false, false, false, false, 0,   true,  255, 0,   0, 90,   4, 0, true,  false };
         BrewingSteps[2] = {2, false, false,  false, 0,   0,    true,  true,  true,  true,  false, 0,   true,  0,   0,   0, 45,   6, 0, false, false };
@@ -170,12 +163,6 @@ void readserial()
       //Drain boiling tank (after brewing)
       case 106: Serial.println("P106");
         Serial1.println("Drain down boiling tank");
-        //openvalve(Valve_boil);  Valve_boilstate = true;
-        //openvalve(Valve_outlet);Valve_outletstate = true;
-        //openvalve(Valve_hop1);  Valve_hop1state = true;
-        //openvalve(Valve_hop2);  Valve_hop2state = true;
-        //openvalve(Valve_hop3);  Valve_hop3state = true;
-        //openvalve(Valve_hop4);  Valve_hop4state = true;
         BrewingSteps[0] = {0, false, false,  false, 0,   0,    false, false, false, false, false, 0,   true,  0,   255, 0, 90,   5, 0, false, true  };
         BrewingSteps[1] = {1, false, false,  false, 0,   0,    true,  true,  true,  true,  false, 0,   true,  0,   0,   0, 45,   6, 0, false, false };
         BrewingSteps[2] = {2, false, false,  false, 0,   0,    false, false, false, false, false, 0,   false, 0,   0,   0, 0,    8, 0, false, false };

@@ -138,13 +138,15 @@ struct BrewingStep BrewingSteps[30] ={/*{0,  false, true,  false, 0,   0,    fal
 
 void Brewing()
 {
-  seconds=millis()/1000-startseconds;
-  currentseconds=millis()/1000-currentstartseconds; 
+  seconds = (millis()/1000) - start_seconds;
+  current_seconds = (millis()/1000) - current_start_seconds; 
   //BrewingSteps BrewingStep[20];
   if (newstepstarted==true)
   {  
-    CurrentStep = BrewingSteps[i].number; Serial.print(CurrentStep); Serial.println(". step");
-    CurrentStepTime = BrewingSteps[i].time*1000; Serial.print(BrewingSteps[i].time*1000); Serial.println(" s");
+    current_start_seconds = millis()/1000;
+    current_seconds = 0;
+    CurrentStep = BrewingSteps[i].number; Serial1.print(CurrentStep); Serial1.println(". step");
+    CurrentStepTime = BrewingSteps[i].time; Serial1.print(CurrentStepTime); Serial1.println(" s");
     
     if (BrewingSteps[i].inletvalve==false && Valve_inletstate == true) {digitalWrite(Valve_inlet, LOW); Valve_inletstate = false; Serial1.println("Inlet valve off");}
     if (BrewingSteps[i].oneway1==true  && Valve_pump1state == false) {openvalve(Valve_pump1);  Valve_pump1state = true;  Serial1.println("One way valve 1 on");}
@@ -249,7 +251,7 @@ void Brewing()
     if (CalibratedTemperature1 >= Setpoint1)
     {
       newstepstarted = true;
-      currentstartseconds = millis()/1000;
+      current_start_seconds = millis()/1000;
       Serial1.println("Temp 1 reached");
     }
   }
@@ -258,7 +260,7 @@ void Brewing()
     if (CalibratedTemperature2 >= Setpoint2)
     {
       newstepstarted = true;
-      currentstartseconds = millis()/1000;
+      current_start_seconds = millis()/1000;
       Serial1.println("Temp 2 reached");
     }
   }
@@ -267,7 +269,7 @@ void Brewing()
     if (Mashingtankempty()==true)
     {
       newstepstarted = true;
-      currentstartseconds = millis()/1000;
+      current_start_seconds = millis()/1000;
       Serial1.println("Mashing tank empty");
     }
   }
@@ -276,17 +278,17 @@ void Brewing()
     if (Boilingtankempty()==true)
     {
       newstepstarted = true;
-      currentstartseconds = millis()/1000;
+      current_start_seconds = millis()/1000;
       Serial1.println("Boiling tank empty");
     }
   }
   //else 
   if (timercondition == true)
   {
-    if (currentseconds >= BrewingSteps[i-1].time)
+    if (current_seconds >= BrewingSteps[i-1].time)
     {
       newstepstarted = true;
-      currentstartseconds = millis()/1000;
+      current_start_seconds = millis()/1000;
       Serial1.print("Time's up ");
       Serial1.println(BrewingSteps[i-1].time);
     }

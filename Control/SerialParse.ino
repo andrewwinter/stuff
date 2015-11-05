@@ -436,24 +436,33 @@ void readserial()
         switchoffeverything();
         brewing = true;
         //mashout = true;
-        startseconds = millis()/1000;
-        currentstartseconds = millis()/1000;
+        start_seconds = millis()/1000;
+        current_start_seconds = millis()/1000;
         brewingstarted = true;
         newstepstarted = true;
         break;
       //Pause sugnal
       case 201: Serial.println("P201");
         Serial1.println("Pause");
-        brewing = false;
-        pausedatcurrentseconds = currentseconds;
-        pausedatseconds = seconds;
+        if(brewing)
+        {
+          brewing = false;
+          paused_at = millis()/1000;
+          paused_at_current_start_seconds = current_start_seconds;
+          paused_at_current_seconds = current_seconds;
+        }
         break;
       //Continue
       case 202: Serial.println("P202");
         Serial1.println("Continue");
-        brewing = true;
-        currentstartseconds = pausedatcurrentseconds;
-        startseconds = pausedatseconds;
+        if(!brewing)
+        {
+          brewing = true;
+          int pause_time = (millis()/1000) - paused_at;
+          Serial.print("Pause time: "); Serial.print(pause_time); Serial.println(" s");
+          current_start_seconds = paused_at_current_start_seconds + pause_time;
+          current_seconds = paused_at_current_seconds;
+        }
         break;
       //Stop
       case 203: Serial.println("P203");

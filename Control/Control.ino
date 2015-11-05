@@ -62,7 +62,7 @@ short numberofsteps = 23;
 int retrythermometer = 0;
 boolean maxpower = false;
 long seconds, tempsecs, tempmins, temphours;
-long startseconds, currentseconds, currentstartseconds, pausedatseconds, pausedatcurrentseconds, timeremaining;
+long start_seconds, current_seconds, current_start_seconds, paused_at_current_start_seconds, paused_at_current_seconds, timeremaining, paused_at;
 int counter = 0;
 int wlsetpoint;
 int currentPWM1, currentPWM2;
@@ -237,7 +237,7 @@ void switchoffeverything()
 void resetvariables()
 {
   seconds = 0;
-  currentseconds = 0;
+  current_seconds = 0;
 }
 
 void switchon(int pin)
@@ -258,12 +258,12 @@ void senddata()
     Serial.println(int(CalibratedTemperature2));
     Serial.print("R103 ");
     Serial.println(seconds);
-    if (currentseconds > 0)
+    if (current_seconds > 0 && brewing == true)
     {
       Serial.print("R104 ");
-      Serial.println(currentseconds);
+      Serial.println(current_seconds);
       Serial.print("R105 ");
-      int current_time = CurrentStepTime - currentseconds;
+      int current_time = CurrentStepTime - current_seconds;
       if(current_time<0) 
       {
         current_time = 0;  

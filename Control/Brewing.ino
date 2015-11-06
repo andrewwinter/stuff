@@ -1,8 +1,9 @@
-boolean waterlevelcondition, temperaturecondition1, temperaturecondition2, tankemptycondition1, tankemptycondition2, timercondition, userinteraction;
+boolean temperaturecondition1, temperaturecondition2, tankemptycondition1, tankemptycondition2, timercondition, userinteraction;
 boolean maxtime, holdwaterlevel, boilingreached;
-boolean newstepstarted = false, brewingstarted = false;
-float Waterlevelsetpoint; 
+boolean brewingstarted = false; 
 int Timesetpoint, i = 0;
+
+boolean check_water_level_at_inlet_start = false;
 
 struct BrewingStep {
   short number;
@@ -141,7 +142,7 @@ void Brewing()
   seconds = (millis()/1000) - start_seconds;
   current_seconds = (millis()/1000) - current_start_seconds; 
   //BrewingSteps BrewingStep[20];
-  if (newstepstarted==true)
+  if (new_step_started==true && !(BrewingSteps[i].inletvalve  && !Boilingtankempty()))
   {  
     current_start_seconds = millis()/1000;
     current_seconds = 0;
@@ -173,7 +174,7 @@ void Brewing()
     if (BrewingSteps[i].outletvalve==false && Valve_outletstate == true ) {closevalve(Valve_outlet); Valve_outletstate = false; Serial1.println("Outlet valve off");}
     if (BrewingSteps[i].inletvalve==true  && Valve_inletstate == false) {digitalWrite(Valve_inlet, HIGH); Valve_inletstate=true; Serial1.println("Inlet valve on");}
     
-    Waterlevelsetpoint=BrewingSteps[i].waterlevel/10.0; Serial.print("Water level setpoint: "); Serial.println(Waterlevelsetpoint);
+    water_level_setpoint = BrewingSteps[i].waterlevel/10.0; Serial.print("Water level setpoint: "); Serial.println(water_level_setpoint);
     Serial1.print("Time: "); Serial1.println(BrewingSteps[i].time);
     Setpoint1 = BrewingSteps[i].temperature1; Serial1.print("Setpoint 1: "); Serial1.println(Setpoint1);
     Setpoint2 = BrewingSteps[i].temperature2; Serial1.print("Setpoint 2: "); Serial1.println(Setpoint2);
@@ -184,7 +185,7 @@ void Brewing()
     analogWrite(Fan4, BrewingSteps[i].fan); 
     //if (BrewingSteps[i].fan > 125) digitalWrite(Fan3, HIGH);
     //else digitalWrite(Fan3, LOW);
-    waterlevelcondition = false;
+    water_level_condition = false;
     temperaturecondition1 = false;
     temperaturecondition2 = false;
     tankemptycondition1 = false;
@@ -199,7 +200,7 @@ void Brewing()
     switch (BrewingSteps[i].condition)
     {
       case 0: Serial1.println("Faulty condition"); break;
-      case 1: waterlevelcondition=true; Serial1.println("Water level condition"); break;
+      case 1: water_level_condition = true; Serial1.println("Water level condition"); break;
       case 2: temperaturecondition1=true; Serial1.println("Temperature 1 condition"); break;
       case 3: temperaturecondition2=true; Serial1.println("Temperature 2 condition"); break;
       case 4: tankemptycondition1=true; Serial1.println("Tank 1 empty condition"); break;
@@ -217,7 +218,7 @@ void Brewing()
       case 2: holdwaterlevel=true; Serial1.println("Hold water level aux condition"); break;
       case 3: maxpower=true; Serial1.println("Max power aux condition"); break;
     }
-    newstepstarted = false;
+    new_step_started = false;
     brewingstarted = false;
     Serial1.print("i: ");
     Serial1.println(i);
@@ -239,18 +240,18 @@ void Brewing()
     }*/
     Serial1.println();
   }
-  if (waterlevelcondition == true)
-  {
-    if (waterlevelcalibrated > (Waterlevelsetpoint-1))
+  if (water_level_condition == true)
+  { 
+    if (water_level_calibrated > (water_level_setpoint - 1))
     {
-      newstepstarted = true;
+      new_step_started = true;
     }
   }
   if (temperaturecondition1 == true)
   {
     if (CalibratedTemperature1 >= Setpoint1)
     {
-      newstepstarted = true;
+      new_step_started = true;
       current_start_seconds = millis()/1000;
       Serial1.println("Temp 1 reached");
     }
@@ -259,7 +260,7 @@ void Brewing()
   {
     if (CalibratedTemperature2 >= Setpoint2)
     {
-      newstepstarted = true;
+      new_step_started = true;
       current_start_seconds = millis()/1000;
       Serial1.println("Temp 2 reached");
     }
@@ -268,7 +269,7 @@ void Brewing()
   {
     if (Mashingtankempty()==true)
     {
-      newstepstarted = true;
+      new_step_started = true;
       current_start_seconds = millis()/1000;
       Serial1.println("Mashing tank empty");
     }
@@ -277,7 +278,7 @@ void Brewing()
   {
     if (Boilingtankempty()==true)
     {
-      newstepstarted = true;
+      new_step_started = true;
       current_start_seconds = millis()/1000;
       Serial1.println("Boiling tank empty");
     }
@@ -287,7 +288,7 @@ void Brewing()
   {
     if (current_seconds >= BrewingSteps[i-1].time)
     {
-      newstepstarted = true;
+      new_step_started = true;
       current_start_seconds = millis()/1000;
       Serial1.print("Time's up ");
       Serial1.println(BrewingSteps[i-1].time);

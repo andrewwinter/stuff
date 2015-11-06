@@ -419,7 +419,7 @@ void readserial()
         Serial1.println("Control valve");
         break;
       case 163:
-        Waterlevelsetpoint = Serial.parseInt();
+        water_level_setpoint = Serial.parseInt();
         Serial.println("P163");
         Serial1.println("Control water level");
         break;
@@ -439,7 +439,7 @@ void readserial()
         start_seconds = millis()/1000;
         current_start_seconds = millis()/1000;
         brewingstarted = true;
-        newstepstarted = true;
+        new_step_started = true;
         break;
       //Pause sugnal
       case 201: Serial.println("P201");
@@ -474,7 +474,7 @@ void readserial()
         Setpoint2 = 0;
         i=0;
         CurrentStep = 0;
-        newstepstarted = false;
+        new_step_started = false;
         break;
       //ID
       case 300: Serial.print("P300 ");
@@ -517,8 +517,8 @@ void readserial()
         switchoffeverything();
         resetvariables();
         i=0;
-        newstepstarted = false;
-        waterlevelcondition = false;
+        new_step_started = false;
+        water_level_condition = false;
         temperaturecondition1 = false;
         temperaturecondition2 = false;
         tankemptycondition1 = false;

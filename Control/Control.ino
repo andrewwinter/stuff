@@ -42,9 +42,10 @@ const int Valve_current = A4;
 const int Pump_current1 = A1;
 const int Pump_current2 = A0;
 
-long waterlevelnull, waterlevel;
-double waterlevelcalibrated;
-
+long water_level_null, water_level;
+double water_level_calibrated;
+boolean water_level_condition;
+float water_level_setpoint;
 
 //Main Variables
 unsigned long ID = 1234567890;
@@ -53,6 +54,7 @@ double CalibratedTemperature1, CalibratedTemperature2;
 short CurrentStep = 0;
 int CurrentStepTime = 0;
 boolean brewing = false;
+boolean new_step_started = false; 
 boolean Valve_inletstate, Valve_mashoutstate, Valve_boilstate, Valve_coolstate;
 boolean Valve_hop1state, Valve_hop2state, Valve_hop3state, Valve_hop4state, Valve_outletstate, Ventilatorstate; 
 boolean Valve_pump1state, Valve_pump2state, Pump_Astate, Pump_Bstate;
@@ -67,6 +69,8 @@ int counter = 0;
 int wlsetpoint;
 int currentPWM1, currentPWM2;
 long looptime = 0;
+long last_pump_in_time = 0;
+long last_loop_time = 0;
 
 //Functions
 void readserial(), controlheater();
@@ -119,8 +123,8 @@ void setup() {
   Temperatures2.setWaitForConversion(false);
   Serial.print("Channel 1 parasite "); Serial.println(Temperatures.isParasitePowerMode());
   Serial.print("Channel 2 parasite "); Serial.println(Temperatures2.isParasitePowerMode());
-  waterlevelnull = level.averageValue(10);
-  Serial.print("Water level nullpoint: "); Serial.println(waterlevelnull);
+  water_level_null = level.averageValue(10);
+  Serial.print("Water level nullpoint: "); Serial.println(water_level_null);
 }
 
 void loop() 
@@ -129,17 +133,28 @@ void loop()
   {
     readserial();
   }
+
+  if((millis() - last_pump_in_time)>200 && water_level_condition)
+  {
+    last_pump_in_time = millis();
+
+    if (water_level_calibrated > (water_level_setpoint - 1))
+    {
+      new_step_started = true;
+    }
+  }
   
-  if (millis()%1000 == 0)
+  if ((millis() - last_loop_time)>1000)
   {
     //Never switch on both heat elements
+    last_loop_time = millis();
     looptime = millis();
     if (digitalRead(Heater1) == true) digitalWrite(Heater2, LOW);
     else if (digitalRead(Heater2) == true) digitalWrite(Heater1, LOW);
     readtemp();
     senddata();
-    waterlevel = level.averageValue(2);
-    waterlevelcalibrated=(waterlevel-waterlevelnull)/35294.1;
+    water_level = level.averageValue(2);
+    water_level_calibrated = (water_level - water_level_null)/35294.1;
     if (maxpower == false)
     {
       controlheater();
@@ -156,8 +171,8 @@ void loop()
     }
     else Serial.println("R107 0");
     Serial.print("Temperature inside: "); Serial.println(Temperature3);
-    Serial.print("Water level delta: "); Serial.println(waterlevel-waterlevelnull);
-    Serial.print("Water level: "); Serial.print(waterlevelcalibrated); Serial.println(" liter");
+    Serial.print("Water level delta: "); Serial.println(water_level - water_level_null);
+    Serial.print("Water level: "); Serial.print(water_level_calibrated); Serial.println(" liter");
     looptime -= millis();
     Serial.print("Loop time "); Serial.println(-looptime);
     //digitalWrite(Led1, !digitalRead(Led1));

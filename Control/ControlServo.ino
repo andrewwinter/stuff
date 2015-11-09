@@ -1,3 +1,6 @@
+const int SERVO_LIMIT = 10;
+const int SERVO_COUNTER_LIMIT = SERVO_LIMIT*100;
+
 int measurecurrent()
 {
   //return(analogRead(A3));
@@ -159,7 +162,8 @@ bool controlValve(short pos, int pin)
 {
   valve.attach(pin);
   valve.write(pos);
-  delay(1000);
+  //delay(1000);
+  servo_delay();
   valve.detach();
 }
 
@@ -222,7 +226,8 @@ bool openvalve(int pin)
     valve.detach();
     if (pos>0) return true;
     else return false;*/
-    delay(1000);
+    //delay(1000);
+    servo_delay();
     valve.detach();
   //}
 }
@@ -242,9 +247,31 @@ bool closevalve(int pin)
   valve.detach();
   if (pos<255) return true;
   else return false;*/
-  delay(1000);
+  //delay(1000);
+  servo_delay();
   valve.detach();
   //Serial.println("Servo detached");
+}
+
+void servo_delay()
+{
+  int counter = 0;
+  int start_value = analogRead(A3);
+  int value = 0;
+
+  while(true)
+  {
+    value = analogRead(A3);
+    if(abs(value - start_value)<=SERVO_LIMIT)  
+    {
+      counter++;  
+    }
+
+    if(counter==SERVO_COUNTER_LIMIT)
+    {
+      break;
+    }
+  }
 }
 
   

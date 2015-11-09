@@ -44,7 +44,7 @@ const int Pump_current2 = A0;
 
 long water_level_null, water_level;
 double water_level_calibrated;
-boolean water_level_condition;
+boolean water_level_condition, water_level_outlet_condition;
 float water_level_setpoint;
 
 //Main Variables
@@ -134,11 +134,12 @@ void loop()
     readserial();
   }
 
-  if((millis() - last_pump_in_time)>200 && water_level_condition)
+  if((millis() - last_pump_in_time)>200 && (water_level_condition || water_level_outlet_condition))
   {
     last_pump_in_time = millis();
 
-    if (water_level_calibrated > (water_level_setpoint - 1))
+    if ((water_level_condition && (water_level_calibrated > (water_level_setpoint - 1))) || 
+        (water_level_outlet_condition && ((water_level_calibrated < (water_level_null - water_level_setpoint)) || Boilingtankempty())))
     {
       new_step_started = true;
     }

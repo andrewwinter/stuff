@@ -193,6 +193,7 @@ void Brewing()
     timercondition = false;
     boilingreached = false;
     userinteraction = false;
+    water_level_outlet_condition = false;
     maxtime = false;
     holdwaterlevel = false;
     maxpower = false;
@@ -208,6 +209,7 @@ void Brewing()
       case 6: timercondition=true; Serial1.println("Timer condition"); break;
       case 7: boilingreached=true; Serial1.println("Boiling condition"); break;
       case 8: userinteraction=true; Serial1.println("Interaction condition"); break;
+      case 9: water_level_outlet_condition = true; Serial1.println("Water level outlet condition"); break;
     }
     //short auxcondition = BrewingSteps[i, 18];
     maxtime = holdwaterlevel = boilingreached = maxpower = false;
@@ -292,6 +294,13 @@ void Brewing()
       current_start_seconds = millis()/1000;
       Serial1.print("Time's up ");
       Serial1.println(BrewingSteps[i-1].time);
+    }
+  }
+  if (water_level_outlet_condition == true)
+  { 
+    if ((water_level_calibrated < (water_level_null - water_level_setpoint)) || Boilingtankempty())
+    {
+      new_step_started = true;
     }
   }
 }

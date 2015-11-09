@@ -185,8 +185,14 @@ void readserial()
       //Automatic water inlet  
       case 108: wlsetpoint = Serial.parseInt();
         Serial.println("P108");
-        BrewingSteps[0] = {0, true,  false, true,  0, 0, false, false, false, false, false, 0, false, 0, 0, wlsetpoint, 0, 1, 0, false, false};
-        BrewingSteps[1] = {1, false, false, false, 0, 0, false, false, false, false, false, 0, false, 0, 0,  0, 0, 8, 0, false, false};
+        BrewingSteps[0] = { 0, true,  false, true,  0, 0, false, false, false, false, false, 0, false, 0, 0, wlsetpoint, 0, 1, 0, false, false };
+        BrewingSteps[1] = { 1, false, false, false, 0, 0, false, false, false, false, false, 0, false, 0, 0, 0,          0, 8, 0, false, false };
+        break;
+      //Automatic water outlet  
+      case 109: wlsetpoint = Serial.parseInt();
+        Serial.println("P108");
+        BrewingSteps[0] = { 0, false, false, false, 0, 0, false, false, false, false, false, 0, true,  0, 255, wlsetpoint, 0, 9, 0, false, true  };
+        BrewingSteps[1] = { 1, false, false, false, 0, 0, false, false, false, false, false, 0, false, 0, 0,   0,          0, 8, 0, false, false };
         break;
       //Inlet valve
       case 110: Serial.println("P110");

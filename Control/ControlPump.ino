@@ -1,5 +1,5 @@
-const int counter_bonus_limit = 4;
-int counter_limit = 12;
+const int COUNTER_BONUS = 4;
+int counter_limit = 10;
 int half_counter_limit = int(counter_limit/2);
 int mashing_counter = 0;
 int boiling_counter = 0;
@@ -16,14 +16,14 @@ boolean Mashingtankempty()
       delay(1000);
       digitalWrite(Pump_A, HIGH);
     } 
-    else if (mashing_counter == (counter_limit + counter_bonus_limit))
+    else if (mashing_counter == (counter_limit + COUNTER_BONUS))
     {
       mashing_counter = 0;
       Serial.println("Empty");
       return true;
     }
   }
-  else if(mashing_counter >= counter_limit && mashing_counter < (counter_limit + counter_bonus_limit))
+  else if(mashing_counter >= counter_limit && mashing_counter < (counter_limit + COUNTER_BONUS))
   {
     counter_limit = mashing_counter;
     half_counter_limit = int(counter_limit/2);
@@ -46,14 +46,14 @@ boolean Boilingtankempty()
       delay(1000);
       digitalWrite(Pump_A, HIGH);
     } 
-    else if (boiling_counter == (counter_limit + counter_bonus_limit))
+    else if (boiling_counter == (counter_limit + COUNTER_BONUS))
     {
       boiling_counter = 0;
       Serial.println("Empty");
       return true;
     }
   }
-  else if(boiling_counter >= counter_limit && boiling_counter < (counter_limit + counter_bonus_limit))
+  else if(boiling_counter >= counter_limit && boiling_counter < (counter_limit + COUNTER_BONUS))
   {
     counter_limit = boiling_counter;
     half_counter_limit = int(counter_limit/2);

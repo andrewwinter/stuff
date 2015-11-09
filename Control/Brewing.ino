@@ -142,7 +142,46 @@ void Brewing()
   seconds = (millis()/1000) - start_seconds;
   current_seconds = (millis()/1000) - current_start_seconds; 
   //BrewingSteps BrewingStep[20];
-  if (new_step_started==true && !(BrewingSteps[i].inletvalve  && !Boilingtankempty()))
+  if(BrewingSteps[i].inletvalve && !check_water_level_at_inlet_start)
+  {
+      if (!Valve_outletstate) 
+      {
+        openvalve(Valve_outlet);  
+        Valve_outletstate = true;  
+        Serial1.println("Outlet valve on");
+      }
+      if (!Valve_boil) 
+      {
+        openvalve(Valve_boil);  
+        Valve_boilstate = true;  
+        Serial1.println("Boil on");
+      }
+      if (!Valve_boil) 
+      {
+        openvalve(Valve_pump2);  
+        Valve_pump2state = true;  
+        Serial1.println("Boil pump on");
+      }
+
+      if(Boilingtankempty())
+      {
+        closevalve(Valve_outlet);  
+        Valve_outletstate = false;  
+        Serial1.println("Outlet valve off");
+        closevalve(Valve_boil);  
+        Valve_boilstate = false;  
+        Serial1.println("Boil off");
+        closevalve(Valve_pump2);  
+        Valve_pump2state = false;  
+        Serial1.println("Boil pump off");
+
+        water_level_null = water_level_calibrated*WATER_LEVEL_TO_LITER;
+        Serial.print("Water levell null: "); Serial.println(water_level_null/WATER_LEVEL_TO_LITER);
+
+        check_water_level_at_inlet_start = true;
+      }
+  } 
+  else if (new_step_started==true)
   {  
     current_start_seconds = millis()/1000;
     current_seconds = 0;
@@ -209,7 +248,11 @@ void Brewing()
       case 6: timercondition=true; Serial1.println("Timer condition"); break;
       case 7: boilingreached=true; Serial1.println("Boiling condition"); break;
       case 8: userinteraction=true; Serial1.println("Interaction condition"); break;
-      case 9: water_level_outlet_condition = true; Serial1.println("Water level outlet condition"); break;
+      case 9: 
+        water_level_outlet_condition = true; 
+        water_level_setpoint = water_level_calibrated - water_level_setpoint;
+        Serial1.println("Water level outlet condition"); 
+        break;
     }
     //short auxcondition = BrewingSteps[i, 18];
     maxtime = holdwaterlevel = boilingreached = maxpower = false;
@@ -298,7 +341,7 @@ void Brewing()
   }
   if (water_level_outlet_condition == true)
   { 
-    if ((water_level_calibrated < (water_level_null - water_level_setpoint)) || Boilingtankempty())
+    if ((water_level_calibrated < water_level_setpoint) || Boilingtankempty())
     {
       new_step_started = true;
     }

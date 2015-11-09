@@ -190,8 +190,8 @@ void readserial()
         break;
       //Automatic water outlet  
       case 109: wlsetpoint = Serial.parseInt();
-        Serial.println("P108");
-        BrewingSteps[0] = { 0, false, false, false, 0, 0, false, false, false, false, false, 0, true,  0, 255, wlsetpoint, 0, 9, 0, false, true  };
+        Serial.println("P109");
+        BrewingSteps[0] = { 0, false, false, true,  0, 0, false, false, false, false, false, 0, true,  0, 255, wlsetpoint, 0, 9, 0, false, true  };
         BrewingSteps[1] = { 1, false, false, false, 0, 0, false, false, false, false, false, 0, false, 0, 0,   0,          0, 8, 0, false, false };
         break;
       //Inlet valve
@@ -446,6 +446,7 @@ void readserial()
         current_start_seconds = millis()/1000;
         brewingstarted = true;
         new_step_started = true;
+        i = 0;
         break;
       //Pause sugnal
       case 201: Serial.println("P201");
@@ -456,6 +457,8 @@ void readserial()
           paused_at = millis()/1000;
           paused_at_current_start_seconds = current_start_seconds;
           paused_at_current_seconds = current_seconds;
+
+          pause_brew();
         }
         break;
       //Continue
@@ -468,6 +471,8 @@ void readserial()
           Serial.print("Pause time: "); Serial.print(pause_time); Serial.println(" s");
           current_start_seconds = paused_at_current_start_seconds + pause_time;
           current_seconds = paused_at_current_seconds;
+
+          continue_brew();
         }
         break;
       //Stop

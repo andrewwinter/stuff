@@ -42,6 +42,8 @@ const int Valve_current = A4;
 const int Pump_current1 = A1;
 const int Pump_current2 = A0;
 
+const float WATER_LEVEL_TO_LITER = 35294.1;
+
 long water_level_null, water_level;
 double water_level_calibrated;
 boolean water_level_condition, water_level_outlet_condition;
@@ -59,6 +61,7 @@ boolean Valve_inletstate, Valve_mashoutstate, Valve_boilstate, Valve_coolstate;
 boolean Valve_hop1state, Valve_hop2state, Valve_hop3state, Valve_hop4state, Valve_outletstate, Ventilatorstate; 
 boolean Valve_pump1state, Valve_pump2state, Pump_Astate, Pump_Bstate;
 short numberofsteps = 23;
+boolean paused_mashout_state, paused_boil_state, paused_hop1_state, paused_hop2_state, paused_hop3_state, paused_hop4_state, paused_cool_state, paused_outlet_state, paused_pump1_state, paused_pump2_state;
 
 //Auxilliary variables
 int retrythermometer = 0;
@@ -134,12 +137,10 @@ void loop()
     readserial();
   }
 
-  if((millis() - last_pump_in_time)>200 && (water_level_condition || water_level_outlet_condition))
+  if(water_level_condition || water_level_outlet_condition)
   {
-    last_pump_in_time = millis();
-
     if ((water_level_condition && (water_level_calibrated > (water_level_setpoint - 1))) || 
-        (water_level_outlet_condition && ((water_level_calibrated < (water_level_null - water_level_setpoint)) || Boilingtankempty())))
+        (water_level_outlet_condition && ((water_level_calibrated < water_level_setpoint) || Boilingtankempty())))
     {
       new_step_started = true;
     }
@@ -155,7 +156,7 @@ void loop()
     readtemp();
     senddata();
     water_level = level.averageValue(2);
-    water_level_calibrated = (water_level - water_level_null)/35294.1;
+    water_level_calibrated = (water_level - water_level_null)/WATER_LEVEL_TO_LITER;
     if (maxpower == false)
     {
       controlheater();
@@ -223,6 +224,145 @@ void initialize()
   Setpoint2 = -2000;
 }
 
+void pause_brew()
+{
+  if (Valve_mashoutstate) 
+  {
+    paused_mashout_state = true;
+    closevalve(Valve_mash); 
+    Serial1.println("Mashing valve off");
+  }
+  if (Valve_boilstate) 
+  {
+    paused_boil_state = true;
+    closevalve(Valve_boil); 
+    Serial1.println("Boiling valve off");
+  }
+  if (Valve_hop1state) 
+  {
+    paused_hop1_state = true;
+    closevalve(Valve_hop1); 
+    Serial1.println("Hop valve 1 off");
+  }
+  if (Valve_hop2state) 
+  {
+    paused_hop2_state = true;
+    closevalve(Valve_hop2); 
+    Serial1.println("Hop valve 2 off");
+  }
+  if (Valve_hop3state) 
+  {
+    paused_hop3_state = true;
+    closevalve(Valve_hop3); 
+    Serial1.println("Hop valve 3 off");
+  }
+  if (Valve_hop4state) 
+  {
+    paused_hop4_state = true;
+    closevalve(Valve_hop4); 
+    Serial1.println("Hop valve 4 off");
+  }
+  if (Valve_coolstate) 
+  {
+    paused_cool_state = true;
+    closevalve(Valve_cool); 
+    Serial1.println("Cooling valve off");
+  }
+  if (Valve_outletstate) 
+  {
+    paused_outlet_state = true;
+    closevalve(Valve_outlet); 
+    Serial1.println("Outlet valve off");
+  }
+  if (Valve_pump1state) 
+  {
+    paused_pump1_state = true;
+    closevalve(Valve_pump1); 
+    Serial1.println("One way valve 1 off");
+  }
+  if (Valve_pump2state) 
+  {
+    paused_pump2_state = true;
+    closevalve(Valve_pump2); 
+    Serial1.println("One way valve 2 off");
+  } 
+}
+
+void continue_brew()
+{
+  if (paused_mashout_state) 
+  {
+    Valve_mashoutstate = true;
+    openvalve(Valve_mash); 
+    Serial1.println("Mashing valve on");
+  }
+  if (paused_boil_state) 
+  {
+    Valve_boilstate = true;
+    openvalve(Valve_boil); 
+    Serial1.println("Boiling valve on");
+  }
+  if (paused_hop1_state) 
+  {
+    Valve_hop1state = true;
+    openvalve(Valve_hop1); 
+    Serial1.println("Hop valve 1 on");
+  }
+  if (paused_hop2_state) 
+  {
+    Valve_hop2state = true;
+    openvalve(Valve_hop2); 
+    Serial1.println("Hop valve 2 on");
+  }
+  if (paused_hop3_state) 
+  {
+    Valve_hop3state = true;
+    openvalve(Valve_hop3); 
+    Serial1.println("Hop valve 3 on");
+  }
+  if (paused_hop4_state) 
+  {
+    Valve_hop4state = true;
+    openvalve(Valve_hop4); 
+    Serial1.println("Hop valve 4 on");
+  }
+  if (paused_cool_state) 
+  {
+    Valve_coolstate = true;
+    openvalve(Valve_cool); 
+    Serial1.println("Cooling valve on");
+  }
+  if (paused_outlet_state) 
+  {
+    Valve_outletstate = true;
+    openvalve(Valve_outlet); 
+    Serial1.println("Outlet valve on");
+  }
+  if (paused_pump1_state) 
+  {
+    Valve_pump1state = true;
+    openvalve(Valve_pump1); 
+    Serial1.println("One way valve 1 on");
+  }
+  if (paused_pump2_state) 
+  {
+    Valve_pump2state = true;
+    openvalve(Valve_pump2); 
+    Serial1.println("One way valve 2 on");
+  } 
+
+  paused_mashout_state = false;
+  paused_boil_state = false;
+  paused_hop1_state = false;
+  paused_hop2_state = false;
+  paused_hop3_state = false;
+  paused_hop4_state = false;
+  paused_cool_state = false;
+  paused_outlet_state = false;
+  paused_pump1_state = false;
+  paused_pump2_state = false;
+}
+
 void switchoffeverything()
 {
   if (Valve_mashoutstate==true ) {closevalve(Valve_mash); Serial1.println("Mashing valve off");}
@@ -248,6 +388,17 @@ void switchoffeverything()
   Setpoint1 = 0;
   Setpoint2 = 0;
   CurrentStep = 0;
+
+  paused_mashout_state = false;
+  paused_boil_state = false;
+  paused_hop1_state = false;
+  paused_hop2_state = false;
+  paused_hop3_state = false;
+  paused_hop4_state = false;
+  paused_cool_state = false;
+  paused_outlet_state = false;
+  paused_pump1_state = false;
+  paused_pump2_state = false;
 }
 
 void resetvariables()

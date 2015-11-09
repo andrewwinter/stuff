@@ -1,5 +1,5 @@
-const int SERVO_LIMIT = 10;
-const int SERVO_COUNTER_LIMIT = SERVO_LIMIT*100;
+const int SERVO_LIMIT = 20;
+const int SERVO_COUNTER_LIMIT = SERVO_LIMIT*150;
 
 int measurecurrent()
 {
@@ -256,13 +256,13 @@ bool closevalve(int pin)
 void servo_delay()
 {
   int counter = 0;
-  int start_value = analogRead(A3);
+  int previous_value = analogRead(A3);
   int value = 0;
 
   while(true)
   {
     value = analogRead(A3);
-    if(abs(value - start_value)<=SERVO_LIMIT)  
+    if(abs(value - previous_value)<=SERVO_LIMIT)  
     {
       counter++;  
     }
@@ -271,6 +271,8 @@ void servo_delay()
     {
       break;
     }
+
+    previous_value = value;
   }
 }
 

@@ -6,6 +6,7 @@ int boiling_counter = 0;
 
 boolean Mashingtankempty()
 {
+  Serial.print("mashing tank analog: "); Serial.println(analogRead(Pump_current1));
   if (analogRead(Pump_current1) < 400)
   {
     mashing_counter++;

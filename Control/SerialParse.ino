@@ -447,6 +447,7 @@ void readserial()
         brewingstarted = true;
         new_step_started = true;
         i = 0;
+        check_water_level_at_inlet_start = false;
         break;
       //Pause sugnal
       case 201: Serial.println("P201");

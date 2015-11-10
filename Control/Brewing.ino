@@ -3,8 +3,6 @@ boolean maxtime, holdwaterlevel, boilingreached;
 boolean brewingstarted = false; 
 int Timesetpoint, i = 0;
 
-boolean check_water_level_at_inlet_start = false;
-
 struct BrewingStep {
   short number;
   boolean inletvalve, mashingvalve, boilingvalve;
@@ -150,16 +148,17 @@ void Brewing()
         Valve_outletstate = true;  
         Serial1.println("Outlet valve on");
       }
-      if (!Valve_boil) 
+      if (!Valve_boilstate) 
       {
         openvalve(Valve_boil);  
         Valve_boilstate = true;  
         Serial1.println("Boil on");
       }
-      if (!Valve_boil) 
+      if (!Valve_pump2state) 
       {
         openvalve(Valve_pump2);  
-        Valve_pump2state = true;  
+        Valve_pump2state = true;
+        digitalWrite(Pump_B, HIGH);  
         Serial1.println("Boil pump on");
       }
 
@@ -172,11 +171,12 @@ void Brewing()
         Valve_boilstate = false;  
         Serial1.println("Boil off");
         closevalve(Valve_pump2);  
-        Valve_pump2state = false;  
+        Valve_pump2state = false; 
+        digitalWrite(Pump_B, LOW); 
         Serial1.println("Boil pump off");
 
-        water_level_null = water_level_calibrated*WATER_LEVEL_TO_LITER;
-        Serial.print("Water levell null: "); Serial.println(water_level_null/WATER_LEVEL_TO_LITER);
+        water_level_null -= water_level_calibrated*WATER_LEVEL_TO_LITER;
+        Serial.print("Water level null: "); Serial.println(water_level_null/WATER_LEVEL_TO_LITER);
 
         check_water_level_at_inlet_start = true;
       }

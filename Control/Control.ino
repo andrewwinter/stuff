@@ -44,10 +44,11 @@ const int Pump_current2 = A0;
 
 const float WATER_LEVEL_TO_LITER = 35294.1;
 
-long water_level_null, water_level;
+long water_level_null, water_level, water_level_delta;
 double water_level_calibrated;
 boolean water_level_condition, water_level_outlet_condition;
 float water_level_setpoint;
+boolean check_water_level_at_inlet_start;
 
 //Main Variables
 unsigned long ID = 1234567890;
@@ -62,6 +63,7 @@ boolean Valve_hop1state, Valve_hop2state, Valve_hop3state, Valve_hop4state, Valv
 boolean Valve_pump1state, Valve_pump2state, Pump_Astate, Pump_Bstate;
 short numberofsteps = 23;
 boolean paused_mashout_state, paused_boil_state, paused_hop1_state, paused_hop2_state, paused_hop3_state, paused_hop4_state, paused_cool_state, paused_outlet_state, paused_pump1_state, paused_pump2_state;
+int paused_valve_inlet, paused_fan1, paused_fan2, paused_fan3, paused_fan4, paused_fan5, paused_pump_A, paused_pump_B, paused_heater1, paused_heater2;
 
 //Auxilliary variables
 int retrythermometer = 0;
@@ -156,7 +158,9 @@ void loop()
     readtemp();
     senddata();
     water_level = level.averageValue(2);
-    water_level_calibrated = (water_level - water_level_null)/WATER_LEVEL_TO_LITER;
+    water_level_delta = water_level - water_level_null;
+    Serial.print(water_level); Serial.print(" "); Serial.println(water_level_null);
+    water_level_calibrated = (water_level_delta)/WATER_LEVEL_TO_LITER;
     if (maxpower == false)
     {
       controlheater();
@@ -173,7 +177,7 @@ void loop()
     }
     else Serial.println("R107 0");
     Serial.print("Temperature inside: "); Serial.println(Temperature3);
-    Serial.print("Water level delta: "); Serial.println(water_level - water_level_null);
+    Serial.print("Water level delta: "); Serial.println(water_level_delta);
     Serial.print("Water level: "); Serial.print(water_level_calibrated); Serial.println(" liter");
     looptime -= millis();
     Serial.print("Loop time "); Serial.println(-looptime);
@@ -226,6 +230,28 @@ void initialize()
 
 void pause_brew()
 {
+  paused_valve_inlet = digitalRead(Valve_inlet);
+  paused_fan1 = digitalRead(Fan1);
+  paused_fan2 = digitalRead(Fan2);
+  paused_fan3 = digitalRead(Fan3);
+  paused_fan4 = digitalRead(Fan4);
+  paused_fan5 = digitalRead(Fan5);
+  paused_pump_A = digitalRead(Pump_A);
+  paused_pump_B = digitalRead(Pump_B);
+  paused_heater1 = digitalRead(Heater1);
+  paused_heater2 = digitalRead(Heater2);
+  
+  digitalWrite(Valve_inlet, LOW);
+  digitalWrite(Fan1, LOW);
+  digitalWrite(Fan2, LOW);
+  digitalWrite(Fan3, LOW);
+  digitalWrite(Fan4, LOW);
+  digitalWrite(Fan5, LOW);
+  digitalWrite(Pump_A, LOW);
+  digitalWrite(Pump_B, LOW);
+  digitalWrite(Heater1, LOW);
+  digitalWrite(Heater2, LOW);
+  
   if (Valve_mashoutstate) 
   {
     paused_mashout_state = true;
@@ -289,7 +315,7 @@ void pause_brew()
 }
 
 void continue_brew()
-{
+{ 
   if (paused_mashout_state) 
   {
     Valve_mashoutstate = true;
@@ -361,6 +387,17 @@ void continue_brew()
   paused_outlet_state = false;
   paused_pump1_state = false;
   paused_pump2_state = false;
+  
+  digitalWrite(Valve_inlet, paused_valve_inlet);
+  digitalWrite(Fan1, paused_fan1);
+  digitalWrite(Fan2, paused_fan2);
+  digitalWrite(Fan3, paused_fan3);
+  digitalWrite(Fan4, paused_fan4);
+  digitalWrite(Fan5, paused_fan5);
+  digitalWrite(Pump_A, paused_pump_A);
+  digitalWrite(Pump_B, paused_pump_B);
+  digitalWrite(Heater1, paused_heater1);
+  digitalWrite(Heater2, paused_heater2);
 }
 
 void switchoffeverything()

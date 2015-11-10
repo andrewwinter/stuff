@@ -1,5 +1,5 @@
 const int SERVO_LIMIT = 20;
-const int SERVO_COUNTER_LIMIT = SERVO_LIMIT*150;
+const int SERVO_COUNTER_LIMIT = SERVO_LIMIT*200;
 
 int measurecurrent()
 {
